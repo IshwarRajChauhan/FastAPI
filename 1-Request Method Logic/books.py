@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Body,FastAPI
 
 # CRUD          HTTP Request Method
 
@@ -60,6 +60,20 @@ async def read_author_by_query(book_author:str,category:str):
             books_to_return.append(BOOKS[book])
 
     return books_to_return
+
+
+## Post Method ------------------------------------------------
+
+# To post, we use a variable called body and we have to import it
+# Get method can not use body
+@app.post("/books/create_book")
+async def create_book(new_book=Body()):
+    new_id = max(BOOKS.keys(), default=0) + 1
+    BOOKS[new_id] = new_book
+    return {"message": "Book created successfully"}
+
+
+
 
 
 
