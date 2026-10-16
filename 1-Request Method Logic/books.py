@@ -73,6 +73,16 @@ async def create_book(new_book=Body()):
     return {"message": "Book created successfully"}
 
 
+## Put Method ------------------------------------------------
+
+@app.put("/books/update_book")
+async def update_book(updated_book=Body()):
+    for i in range(1, len(BOOKS)+1):
+        for i in BOOKS:
+            if BOOKS[i].get('title').casefold() == updated_book.get('title').casefold():
+                BOOKS[i] = updated_book
+                return {"message": "Book updated successfully"}
+
 
 
 
