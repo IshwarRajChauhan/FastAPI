@@ -13,8 +13,8 @@ BOOKS = {
     1: {'title': 'Title One', 'author': 'Author One', 'category': 'science'},
     2: {'title': 'Title Two', 'author': 'Author Two', 'category': 'science'},
     3: {'title': 'Title Three', 'author': 'Author Three', 'category': 'history'},
-    4: {'title': 'Title Four', 'author': 'Author Four', 'category': 'math'},
-    5: {'title': 'Title Five', 'author': 'Author Five', 'category': 'math'}
+    4: {'title': 'Title Four', 'author': 'Author Two', 'category': 'math'},
+    5: {'title': 'Title Five', 'author': 'Author One', 'category': 'math'}
 }
 
 
@@ -26,6 +26,9 @@ app = FastAPI()
 async def read_all_books():
     return BOOKS
 
+
+# Path Parameters-------------------------------------------------
+
 #FastAPI runs from Top to Bottom
 
 @app.get("/books/{book_title}")
@@ -33,6 +36,32 @@ async def read_book(book_title: str):
     for book in BOOKS:
         if BOOKS[book].get("title").casefold() == book_title.casefold():
             return BOOKS[book]
+
+
+# Query Parameters ----------------------------------------------
+
+@app.get("/books/")
+async def read_category_by_query(category:str):
+    books_to_return = []
+    for book in BOOKS:
+        if BOOKS[book].get('category').casefold() == category.casefold():
+            books_to_return.append(BOOKS[book])
+    return books_to_return
+
+
+
+# Both path and Query parameter ----------------------------------
+@app.get("/books/{book_author}/")
+async def read_author_by_query(book_author:str,category:str):
+    books_to_return = []
+    for book in BOOKS:
+        if BOOKS[book].get('author').casefold() == book_author.casefold() and \
+            BOOKS[book].get('category').casefold() == category.casefold():
+            books_to_return.append(BOOKS[book])
+
+    return books_to_return
+
+
 
 
 
