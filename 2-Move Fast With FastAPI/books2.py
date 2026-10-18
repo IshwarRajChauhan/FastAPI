@@ -25,12 +25,23 @@ class Book:
 
 
 class BookRequest(BaseModel):
-    id: Optional[str] = None
+    id: Optional[int] = Field(description="Id is not needed on create",default=None)
     title:str = Field(min_length=3)
     author:str = Field(min_length=1)
     description:str = Field(min_length=1,max_length=100)
     rating:int = Field(gt=-1,lt=6)  #(greater than , less than)
 
+
+    model_config={
+        "json_schema_extra":{
+            "example":{
+                "title": "A new book",
+                "author": "codingwithruby",
+                "description": "A new description of a book",
+                "rating": 5
+            }
+        }
+    }
 
 
 # --------------------------------------------------------------
@@ -53,8 +64,27 @@ BOOKS = [
 async def read_all_books():
     return BOOKS
 
-# --------------------------------------------------------------
 
+#Use a path parameter when you want to access a specific resource.
+@app.get("/books/{book_id}")
+async def read_book(book_id: int):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book
+
+
+#Use a query parameter when you want to filter, sort, search, or customize a request.
+@app.get("/books/")
+async def read_book_by_rating(book_rating: int):
+    books_to_return = []
+    for book in BOOKS:
+        if book.rating == book_rating:
+            books_to_return.append(book)
+    return books_to_return
+
+
+
+# -----------------------------------------------------
 
 
 #First we have to validate our data before posting, so the pipeline:
@@ -77,6 +107,18 @@ def find_book_id(book: Book):
     return book
 
 
+
+#--------------------------------------------------------
+
+@app.put("/books/update_book")
+async def update_book(book : BookRequest):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book.id:
+            BOOKS[i]=book
+
+
+
+#--------------------------------------------------------
 
 
 
