@@ -72,6 +72,7 @@ async def update_todo(db: db_dependency,
     todo_model.complete = todo_request.complete
 
     db.add(todo_model)
+    print("item updated")
     db.commit()
 
 
