@@ -7,11 +7,16 @@ from models import Todos
 from database import SessionLocal, engine
 
 
+from routers import auth
+
 
 app = FastAPI()
-
 models.Base.metadata.create_all(bind=engine)
 
+
+# 4.Import the file from router
+# 5. Then Route it
+app.include_router(auth.router)
 
 
 def get_db():
