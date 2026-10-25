@@ -11,7 +11,7 @@ from .auth import get_current_user
 
 router = APIRouter(
     prefix='/admin',      # har endpoint ke aage admin lag jayega
-    tags=['admin']        # ek naya section ban jayega 
+    tags=['admin']        # ek naya section ban jayega admin naam ka jisse keval admin wale endpoints hoge
 )
 
 
