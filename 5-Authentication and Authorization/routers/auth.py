@@ -1,20 +1,31 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone     #handling token expiration
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from models import users
+from models import users        #database table from madels.py
 from database import SessionLocal
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
-from jose import jwt,JWTError
+from passlib.context import CryptContext        # for password hashing
+from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer   
+# OAuth2PasswordRequestForm	: Reads username and password submitted as form data
+# OAuth2PasswordBearer : Extracts a bearer token from the Authorization header
+from jose import jwt,JWTError  #JWT creation and verification
+
+# What each group does:
+# - datetime, timedelta, timezone — calculate JWT expiration.
+# - Annotated — define reusable dependency types.
+# - APIRouter, Depends, HTTPException, status — routes, dependency injection, and HTTP errors.
+# - BaseModel — validate request and response data.
+# - Session — database interaction.
+# - User — your SQLAlchemy user model.
+# - SessionLocal — create database sessions.
+# - CryptContext — hash and verify passwords.
+# - OAuth2PasswordRequestForm — read login credentials.
+# - OAuth2PasswordBearer — extract the bearer token.
+# - jwt, JWTError — create and validate JWTs. 
 
 
-#To use different fastapi app , we need to route it 
-# 1.First create a routers folder , and in it create your file
-# 2. Import APIRouters , and just we create an instance of app , we create an instance of router
-# 3.Now use that instance in place of app
-
+# -------------------------------------------------------------------
 
 
 router = APIRouter(
@@ -22,12 +33,21 @@ router = APIRouter(
     tags=['auth']
 )
 
+#Why? This groups your authentication endpoints under /auth
+# -------------------------------------------------------------------
 
 SECRET_KEY = '38695eb2ae0cef08fb8272fd0439450d282276c729f5169e083f348ea9304829'
 ALGORITHM = 'HS256'
 
-bcrypt_context = CryptContext(schemes=['bcrypt'],deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
+
+bcrypt_context = CryptContext(schemes=['bcrypt'],deprecated='auto')      #password hashing
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')              #extracting the JWT
+
+# SECRET_KEY and ALGORITHM configure JWT signing and verification.
+# bcrypt_context handles password hashing.
+# oauth2_bearer extracts a JWT from the request's Authorization header.
+
+# -------------------------------------------------------------------
 
 class CreateUserRequest(BaseModel):
     username: str
@@ -43,6 +63,7 @@ class Token(BaseModel):
     access_token : str
     token_type : str
 
+# -------------------------------------------------------------------
 
 def get_db():
     db = SessionLocal()
@@ -55,6 +76,10 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
+# Database dependy for user table
+
+# -------------------------------------------------------------------
+
 
 def authenticate_user(username:str,password:str,db):
     user = db.query(users).filter(users.username == username).first()
@@ -65,6 +90,10 @@ def authenticate_user(username:str,password:str,db):
     return user
 
 
+# If authentication fails, the endpoint rejects the login. 
+# If it succeeds, the endpoint creates a JWT.
+
+# -------------------------------------------------------------------
 
 def create_access_token(username: str,user_id:int,expires_delta: timedelta):
     encode = {'sub':username,'id': user_id}
@@ -73,6 +102,10 @@ def create_access_token(username: str,user_id:int,expires_delta: timedelta):
     return jwt.encode(encode,SECRET_KEY,algorithm=ALGORITHM)
 
 
+# sub — identifies the subject, which is the username here.
+# id — stores your user's database ID.
+
+# -------------------------------------------------------------------
 
 
 async def get_current_user(token:Annotated[str,Depends(oauth2_bearer)]):
@@ -87,7 +120,7 @@ async def get_current_user(token:Annotated[str,Depends(oauth2_bearer)]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Could not Validate User.')
 
 
-
+# -------------------------------------------------------------------
 
 
 
@@ -107,6 +140,9 @@ async def create_user(db:db_dependency,create_user_request:CreateUserRequest):
     
     db.add(create_user_model)
     db.commit()
+
+# -------------------------------------------------------------------
+
 
 
 
