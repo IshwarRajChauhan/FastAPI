@@ -5,8 +5,8 @@ from sqlalchemy.ext.declarative import declarative_base
 #---------------------------------------------------------
 #For sqlite3
 
-# SQLALCHEMY_DATABASE_URL = 'sqlite:///./todosapp.db'
-# engine = create_engine(SQLALCHEMY_DATABASE_URL,connect_args={'check_same_thread':False})
+SQLALCHEMY_DATABASE_URL = 'sqlite:///./todosapp.db'
+engine = create_engine(SQLALCHEMY_DATABASE_URL,connect_args={'check_same_thread':False})
 
 #---------------------------------------------------------
 #For PostgreSQL
@@ -16,8 +16,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 #---------------------------------------------------------
 #For MySQL
-SQLALCHEMY_DATABASE_URL = 'mysql+pymysql://root:Admin123!@127.0.0.1:3306/todoapplicationdatabase'
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# SQLALCHEMY_DATABASE_URL = 'mysql+pymysql://root:Admin123!@127.0.0.1:3306/todoapplicationdatabase'
+# engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 
 
