@@ -12,8 +12,7 @@ class users(Base):
     last_name = Column(String)
     hashed_password = Column(String)
     is_active = Column(Boolean,default=False)
-    role = Column(String)
-
+    role = Column(String) 
 
 
 class Todos(Base):
