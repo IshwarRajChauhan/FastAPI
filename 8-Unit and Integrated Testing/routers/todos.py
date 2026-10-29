@@ -66,7 +66,6 @@ async def create_todo(user:user_dependency,db: db_dependency, todo_request: Todo
     if user is None:
         raise HTTPException(status_code=401,ddetail = "Authentication Failed")
     db.add(todo_model)
-    print("Record Inserted")
     db.commit()
 
 
