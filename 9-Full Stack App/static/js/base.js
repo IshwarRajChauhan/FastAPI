@@ -174,24 +174,33 @@
             const form = event.target;
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
+            const passwordMismatchError = document.getElementById('passwordMismatchError');
 
-            if (data.password !== data.password2) {
-                alert("Passwords do not match");
+            if (data.password !== data.confirm_password) {
+                if (passwordMismatchError) {
+                    passwordMismatchError.style.display = 'block';
+                } else {
+                    alert("Passwords do not match");
+                }
                 return;
+            }
+
+            if (passwordMismatchError) {
+                passwordMismatchError.style.display = 'none';
             }
 
             const payload = {
                 email: data.email,
                 username: data.username,
-                first_name: data.firstname,
-                last_name: data.lastname,
+                first_name: data.first_name,
+                last_name: data.last_name,
                 role: data.role,
                 phone_number: data.phone_number,
                 password: data.password
             };
 
             try {
-                const response = await fetch('/auth', {
+                const response = await fetch('/auth/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

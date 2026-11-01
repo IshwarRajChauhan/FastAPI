@@ -1,4 +1,5 @@
-{% include "layout.html" %}
+{% extends "layout.html" %}
+{% block content %}
 <div class="container">
     <div class="card">
         <div class="card-header">
@@ -31,6 +32,9 @@
                         <label>Confirm Password</label>
                         <input type="password" class="form-control" name="confirm_password" autocomplete="new-password" required>
                     </div>
+                    <div id="passwordMismatchError" class="form-group col-md-12" style="display: none;">
+                        <div class="alert alert-danger" role="alert">Passwords do not match</div>
+                    </div>
                     <div class="form-group col-md-6">
                         <label>Role</label>
                         <select class="form-control" name="role" required>
@@ -53,3 +57,4 @@
         </div>
     </div>
 </div>
+{% endblock %}
