@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 from jose import jwt,JWTError
 from fastapi.templating import Jinja2Templates
-
+from fastapi.responses import HTMLResponse
 #To use different fastapi app , we need to route it 
 # 1.First create a routers folder , and in it create your file
 # 2. Import APIRouters , and just we create an instance of app , we create an instance of router
@@ -72,7 +72,7 @@ async def render_login_page(request: Request):
     )
 
 
-@router.get("/register-page")
+@router.get("/register-page",response_class=HTMLResponse)
 async def render_register_page(request: Request):
     return templates.TemplateResponse(
         request=request,
