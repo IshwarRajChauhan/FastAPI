@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Request,HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from models import users
@@ -8,7 +8,7 @@ from database import SessionLocal
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 from jose import jwt,JWTError
-
+from fastapi.templating import Jinja2Templates
 
 #To use different fastapi app , we need to route it 
 # 1.First create a routers folder , and in it create your file
@@ -57,6 +57,30 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 
 
+templates = Jinja2Templates(directory="templates")
+
+
+##pages
+
+
+@router.get("/login-page")
+async def render_login_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={}
+    )
+
+
+@router.get("/register-page")
+async def render_register_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="register.html",
+        context={}
+    )
+
+## Endpoints
 def authenticate_user(username:str,password:str,db):
     user = db.query(users).filter(users.username == username).first()
     if not user:
