@@ -1,0 +1,233 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container">
+    <div class="card">
+
+        <div class="card-header">
+            Edit your todo
+        </div>
+
+        <div class="card-body">
+            <form id="todoForm">
+
+                <div class="form-group">
+                    <label>Title</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="title"
+                        id="title"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea
+                        class="form-control"
+                        rows="3"
+                        name="description"
+                        id="description"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select
+                        class="form-control"
+                        name="priority"
+                        id="priority"
+                        required
+                    >
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Complete</label>
+                    <select
+                        class="form-control"
+                        name="complete"
+                        id="complete"
+                        required
+                    >
+                        <option value="false">Incomplete</option>
+                        <option value="true">Complete</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Update Todo
+                </button>
+
+                <button
+                    type="button"
+                    id="deleteButton"
+                    class="btn btn-danger"
+                >
+                    Delete Todo
+                </button>
+
+                <a href="/todos/todo-page" class="btn btn-success">
+                    Back
+                </a>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const todoForm = document.getElementById('todoForm');
+    const deleteButton = document.getElementById('deleteButton');
+
+    const todoId = window.location.pathname.split('/').pop();
+
+    async function loadTodo() {
+
+        const tokenCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('access_token='));
+
+        if (!tokenCookie) {
+            window.location.href = '/auth/login-page';
+            return;
+        }
+
+        const token = tokenCookie.substring('access_token='.length);
+
+        try {
+            const response = await fetch(`/todos/todo/${todoId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const todo = await response.json();
+
+                document.getElementById('title').value = todo.title;
+                document.getElementById('description').value = todo.description;
+                document.getElementById('priority').value = todo.priority;
+                document.getElementById('complete').value = String(todo.complete);
+
+            } else {
+                alert('Could not load Todo!');
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert('Something went wrong while loading Todo!');
+        }
+    }
+
+    loadTodo();
+
+
+    // Update Todo
+
+    todoForm.addEventListener('submit', async function(event) {
+
+        event.preventDefault();
+
+        const tokenCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('access_token='));
+
+        if (!tokenCookie) {
+            window.location.href = '/auth/login-page';
+            return;
+        }
+
+        const token = tokenCookie.substring('access_token='.length);
+
+        const todoData = {
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            priority: Number(document.getElementById('priority').value),
+            complete: document.getElementById('complete').value === 'true'
+        };
+
+        try {
+            const response = await fetch(`/todos/todo/${todoId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(todoData)
+            });
+
+            if (response.ok) {
+                alert('Todo updated successfully!');
+                window.location.href = '/todos/todo-page';
+            } else {
+                const error = await response.json();
+                alert(JSON.stringify(error));
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert('Something went wrong while updating Todo!');
+        }
+    });
+
+
+    // Delete Todo
+
+    deleteButton.addEventListener('click', async function() {
+
+        const confirmDelete = confirm(
+            'Are you sure you want to delete this Todo?'
+        );
+
+        if (!confirmDelete) {
+            return;
+        }
+
+        const tokenCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('access_token='));
+
+        if (!tokenCookie) {
+            window.location.href = '/auth/login-page';
+            return;
+        }
+
+        const token = tokenCookie.substring('access_token='.length);
+
+        try {
+            const response = await fetch(`/todos/todo/${todoId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 204) {
+                alert('Todo deleted successfully!');
+                window.location.href = '/todos/todo-page';
+            } else {
+                const error = await response.json();
+                alert(JSON.stringify(error));
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert('Something went wrong while deleting Todo!');
+        }
+    });
+
+</script>
+
+{% endblock %}
