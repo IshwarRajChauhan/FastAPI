@@ -1,0 +1,112 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Make a new todo
+        </div>
+
+        <div class="card-body">
+            <form id="todoForm">
+
+                <div class="form-group">
+                    <label>Title</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="title"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea
+                        class="form-control"
+                        rows="3"
+                        name="description"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select class="form-control" name="priority" required>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Add new todo
+                </button>
+
+                <a href="/todos/todo-page" class="btn btn-success">
+                    Back
+                </a>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const todoForm = document.getElementById('todoForm');
+
+    todoForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(todoForm);
+
+        const tokenCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('access_token='));
+
+        if (!tokenCookie) {
+            alert('Please login again!');
+            window.location.href = '/auth/login-page';
+            return;
+        }
+
+        const token = tokenCookie.substring('access_token='.length);
+
+        const todoData = {
+            title: formData.get('title'),
+            description: formData.get('description'),
+            priority: Number(formData.get('priority')),
+            complete: false
+        };
+
+        try {
+            const response = await fetch('/todos/todo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(todoData)
+            });
+
+            if (response.ok) {
+                alert('Todo added successfully!');
+                window.location.href = '/todos/todo-page';
+            } else {
+                const error = await response.json();
+                console.log(error);
+                alert(JSON.stringify(error));
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert('Something went wrong!');
+        }
+    });
+</script>
+
+{% endblock %}

@@ -87,6 +87,37 @@ async def render_todo_page(request: Request, db: db_dependency):
 
 
 
+
+
+
+@router.get('/add-todo-page')
+async def render_add_todo_page(request: Request):
+    try:
+        user = await get_current_user(
+            request.cookies.get('access_token')
+        )
+
+        if user is None:
+            return redirect_to_login()
+
+        return templates.TemplateResponse(
+            request=request,
+            name="add-todo.html",
+            context={
+                "user": user
+            }
+        )
+
+    except Exception as e:
+        print("ERROR IN ADD TODO PAGE:", e)
+        return redirect_to_login()
+
+
+
+
+
+
+
 #---------------------------------
 # Endpoints
 @router.get("/",status_code=status.HTTP_200_OK)
@@ -110,13 +141,29 @@ async def read_table(user:user_dependency,db:db_dependency,todo_id:int = Path(gt
 
 
 
+
 @router.post("/todo", status_code=status.HTTP_201_CREATED)
-async def create_todo(user:user_dependency,db: db_dependency, todo_request: TodoRequest):
-    todo_model = Todos(**todo_request.model_dump(),owner_id = user.get('id'))
+async def create_todo(
+    user: user_dependency,
+    db: db_dependency,
+    todo_request: TodoRequest
+):
     if user is None:
-        raise HTTPException(status_code=401,ddetail = "Authentication Failed")
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication Failed"
+        )
+
+    todo_model = Todos(
+        **todo_request.model_dump(),
+        owner_id=user.get('id')
+    )
+
     db.add(todo_model)
     db.commit()
+    db.refresh(todo_model)
+
+    return todo_model
 
 
 
