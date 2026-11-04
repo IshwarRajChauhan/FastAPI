@@ -15,6 +15,7 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL,connect_args={'check_same_thread'
 # engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 #---------------------------------------------------------
+
 #For MySQL
 # SQLALCHEMY_DATABASE_URL = 'mysql+pymysql://root:Admin123!@127.0.0.1:3306/todoapplicationdatabase'
 # engine = create_engine(SQLALCHEMY_DATABASE_URL)
